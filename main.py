@@ -9,7 +9,7 @@ FAKE_API_KEY = "secret123"
 
 api_key_header = APIKeyHeader(name=API_KEY_NAME, auto_error=False)
 
-@app.get("/honeypot")
+@app.post("/honeypot")
 async def honeypot(
     request: Request,
     api_key: str = Security(api_key_header)
@@ -19,7 +19,10 @@ async def honeypot(
 
     if api_key != FAKE_API_KEY:
         print(f"[ALERT] Unauthorized access from {attacker_ip} at {time}")
-        raise HTTPException(status_code=401, detail="Unauthorized access detected")
+        raise HTTPException(
+            status_code=401,
+            detail="Unauthorized access detected"
+        )
 
     return {
         "status": "ok",
