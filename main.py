@@ -9,11 +9,8 @@ FAKE_API_KEY = "secret123"
 
 api_key_header = APIKeyHeader(name=API_KEY_NAME, auto_error=False)
 
-@app.post("/honeypot")
-async def honeypot(
-    request: Request,
-    api_key: str = Security(api_key_header)
-):
+
+def validate_api_key(request: Request, api_key: str):
     attacker_ip = request.client.host
     time = datetime.utcnow().isoformat()
 
@@ -29,3 +26,19 @@ async def honeypot(
         "message": "Honeypot endpoint reached",
         "timestamp": time
     }
+
+
+@app.get("/honeypot")
+async def honeypot_get(
+    request: Request,
+    api_key: str = Security(api_key_header)
+):
+    return validate_api_key(request, api_key)
+
+
+@app.post("/honeypot")
+async def honeypot_post(
+    request: Request,
+    api_key: str = Security(api_key_header)
+):
+    return validate_api_key(request, api_key)
